@@ -1,0 +1,179 @@
+<html>
+
+<h1>
+    Wemos D1 mini
+</h1>
+
+<h2>
+     a mini wifi board based on ESP-8266EX
+</h2>
+
+<img src="d1miniv2.jpg" height="200" />
+
+<h3>
+    Introduction
+</h3>
+
+<p>
+    We'll be making wifi-enabled sensors using the Wemos D1 mini V2. There are 2 types of shields available:
+</p>
+
+<ul>
+    <li>A <a href="https://www.wemos.cc/product/dht-shield.html">temperature</a> shield</li>
+    <li>A <a href="https://www.wemos.cc/product/protoboard.html">prototyping</a> shield. Can be used to connect your own sensors</li>
+</ul>
+
+<p>
+    The goal is to have each sensor
+    <ol>
+        <li>connected to the network broadcasting sensor data</li>
+        <li>without hard-coded credentials</li>
+        <li>packaged into a standalone unit together with power adapter (5V)</li>
+    </ol>
+</p>
+
+<h3>
+    Preperations
+</h3>
+
+<p>You should already have PlatformIO installed, but if you don't, see the <a href="https://github.com/jayway/platformio-lab">PlatformIO lab</a></p>
+<ul>
+    <li>
+        Install <a href="https://www.wemos.cc/product/d1-mini.html">Wemos D1 mini</a> drivers if needed (only Mac & Windows). Note that older versions of the driver will cause a kernel panic on Mac. Drivers can be found <a href="https://www.wemos.cc/downloads">here</a> and <a href="https://blog.sengotta.net/signed-mac-os-driver-for-winchiphead-ch340-serial-bridge/">here</a>.
+    </li>
+</ul>
+
+<h3>
+    Lab 1 - getting started
+</h3>
+
+<p>
+    Create a new project in PlatformIO for your Wemos D1 mini, add code to make the standard board LED blink, then upload & run.
+</p>
+
+<pre>
+<code>
+#include &lt;Arduino.h&gt;
+
+int blink = LOW;
+
+void setup()
+{
+  Serial.begin(115200);
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, blink);
+  Serial.println();
+}
+
+void loop()
+{
+  Serial.print(".");
+  blink = (blink == LOW ? HIGH : LOW);
+  digitalWrite(LED_BUILTIN, blink);
+  delay(1000);
+}
+</code>
+</pre>
+
+<h3>
+    Lab 2 - connecting to Wifi
+</h3>
+
+<p>
+    Add code to connect to the local WIFI. The very neat <a href="https://github.com/tzapu/WiFiManager">WiFiManager</a> automatically acts as an AP if unable to connect to last known network.
+</p>
+
+<pre>
+<code>
+#include &lt;Arduino.h&gt;
+#include &lt;WiFiManager.h&gt;
+
+char name[] = "mywemos";
+
+void configModeCallback (WiFiManager *myWiFiManager) {
+  Serial.println("Entered AP mode for configuration");
+  Serial.print("SSID: ");
+  Serial.println(myWiFiManager->getConfigPortalSSID());
+  Serial.print("IP address: ");
+  Serial.println(WiFi.softAPIP());
+}
+
+void setup()
+{
+  Serial.begin(115200);
+
+  WiFiManager wifiManager;
+
+  // for debugging
+  //wifiManager.resetSettings();
+
+  wifi_station_set_hostname(name);
+
+  // set callback that gets called when connecting to previous WiFi fails,
+  // and enters AP mode
+  wifiManager.setAPCallback(configModeCallback);
+
+  // fetches ssid and pass from eeprom and tries to connect
+  // if it does not connect it starts an access point with the specified name
+  // and goes into a blocking loop awaiting configuration
+  if(!wifiManager.autoConnect()) {
+    Serial.println("failed to connect and hit timeout");
+    // reset and try again
+    ESP.reset();
+    delay(1000);
+  }
+
+  Serial.println("Connected!");
+  Serial.print("SSID: ");
+  Serial.println(WiFi.SSID());
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+  Serial.print("MAC: ");
+  Serial.println(WiFi.macAddress());
+  Serial.print("Hostname: ");
+  Serial.println(WiFi.hostname());
+  Serial.print("GW IP: ");
+  Serial.println(WiFi.gatewayIP());
+}
+
+void loop()
+{
+  Serial.print(".");
+  delay(5000);
+}
+</code>
+</pre>
+
+<h3>
+    Lab 3 - a simple web server
+</h3>
+
+<p>
+    Letting the D1 mini act as a webserver can be handy for configuration purposes, e.g to passing over security credentials.
+</p>
+
+<h3>
+    Lab 4 - reading sensor data
+</h3>
+
+<p>
+    TODO
+</p>
+
+<h3>
+    Lab 6 - MQTT and tying it all together
+</h3>
+
+<p>
+    TODO
+</p>
+
+<h3>
+    Lab 7 - Using AWS IoT
+</h3>
+
+<p>
+    TODO
+</p>
+
+</html>
