@@ -149,8 +149,50 @@ void loop()
 </h3>
 
 <p>
-    Letting the D1 mini act as a webserver can be handy for configuration purposes, e.g to passing over security credentials.
+    Letting the D1 mini act as a webserver can be handy for configuration purposes, e.g to passing over security credentials. There is a simple web server called <a href="https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WebServer">ESP8266WebServer</a> in the Arduino libraries.
 </p>
+
+<pre>
+<code>
+#include &lt;Arduino.h&gt;
+#include &lt;WiFiManager.h&gt;
+#include &lt;ESP8266WebServer.h&gt;
+
+char name[] = "mywemos";
+ESP8266WebServer server(80);
+
+void handleRoot()
+{
+  server.send(200, "text/plain", "hello from esp8266!");
+}
+
+void setup()
+{
+  Serial.begin(115200);
+  WiFiManager wifiManager;
+  wifi_station_set_hostname(name);
+  wifiManager.autoConnect();
+
+  // register handlers (can both be function pointers or lambdas)
+  server.on("/", handleRoot);
+  server.onNotFound([](){
+      server.send(404, "text/plain", "404 Not found");
+  });
+
+  // start server
+  server.begin();
+  Serial.println("HTTP server started");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
+void loop()
+{
+  // handle next request
+  server.handleClient();
+}
+</code>
+</pre>
 
 <h3>
     Lab 4 - reading sensor data
