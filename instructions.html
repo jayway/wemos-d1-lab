@@ -370,12 +370,24 @@ void loop()
 </h3>
 
 <p>
-    <ul>
-    <li><a href="https://github.com/heskew/aws-sdk-arduino">https://github.com/heskew/aws-sdk-arduino</a></li>
-    <li><a href="http://stackoverflow.com/questions/40378582/connecting-esp8266-to-aws-iot">http://stackoverflow.com/questions/40378582/connecting-esp8266-to-aws-iot</a></li>
-    <li><a href="http://blogs.paasmer.co/series-blogs-connect-esp-8266-nodemcu-aws-iot/">http://blogs.paasmer.co/series-blogs-connect-esp-8266-nodemcu-aws-iot/</a></li>
-    <li><a href="https://github.com/aws/aws-iot-device-sdk-embedded-C/issues/7">https://github.com/aws/aws-iot-device-sdk-embedded-C/issues/7</a></li>
-    </ul>
+  The <a href="https://aws.amazon.com/iot/sdk/">AWS IoT device SDKs</a> currently does not support the ESP8266. One problem is that AWS IoT devices are authenticated using X.509 certificates. See <a href="http://docs.aws.amazon.com/iot/latest/developerguide/iot-security-identity.html">documentation</a>. In short, the device must support:
+  <ul>
+    <li>TLS1.2</li>
+    <li>SHA-256 RSA certificate signature validation</li>
+    <li>One of the cipher suites from the TLS cipher suite support section</li>
+  </ul>
+  Neither the SDK from <a href="https://espressif.com/en/support/download/sdks-demos">Espressif</a> nor the <a href="https://github.com/esp8266/Arduino">Arduino Core</a> implementation currently support TLS1.2.   
+</p>
+
+<p>
+  There are different approaches to supporting AWS IoT service. Listing some below:
+  <ul>
+    <li>Arduino Core dev branch has a version of axTLS that support TLS1.2. The <a href="https://github.com/aws/aws-iot-device-sdk-embedded-C">AWS IoT Device SDK for embedded C</a> uses mbedTLS. Maybe it is possible to use axTLS instead?</li>
+    <li>AWS also have a new <a href="https://github.com/aws/aws-iot-device-sdk-cpp">Device SDK for C++</a> that has an abstract Network layer allowing different TLS libraries. Currently, there are reference implementations for openSSL, mbedTLS and Websockets. Maybe easier to port this?</li>
+    <li>One guy have cheated a little by using AWS IAM user credentials together with websockets to connect to AWS IoT. Requires you to hardcode the credentials in the code. Check it out <a href="https://github.com/odelot/aws-mqtt-websockets">here</a></li>
+    <li>Other initiatives that uses AWS IAM user credentials to connect to AWS services <a href="https://github.com/heskew/aws-sdk-arduino">here</a></li>
+    <li>A kind of wild idea is to use a completely different RTOS on the device, see <a href="http://blogs.paasmer.co/series-blogs-connect-esp-8266-nodemcu-aws-iot/">ESP-OPEN-RTOS</a>
+  </ul>
 </p>
 
 </html>
