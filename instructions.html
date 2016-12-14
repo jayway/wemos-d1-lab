@@ -19,8 +19,8 @@
 </p>
 
 <ul>
-    <li>A <a href="https://www.wemos.cc/product/dht-shield.html">temperature</a> shield</li>
-    <li>A <a href="https://www.wemos.cc/product/protoboard.html">prototyping</a> shield. Can be used to connect your own sensors</li>
+    <li>A <a href="https://www.wemos.cc/product/dht-shield.html" target="_blank">temperature</a> shield</li>
+    <li>A <a href="https://www.wemos.cc/product/protoboard.html" target="_blank">prototyping</a> shield. Can be used to connect your own sensors</li>
 </ul>
 
 <p>
@@ -36,10 +36,10 @@
     Preperations
 </h3>
 
-<p>You should already have PlatformIO installed, but if you don't, see the <a href="https://github.com/jayway/platformio-lab">PlatformIO lab</a></p>
+<p>You should already have PlatformIO installed, but if you don't, see the <a href="https://github.com/jayway/platformio-lab" target="_blank">PlatformIO lab</a></p>
 <ul>
     <li>
-        Install <a href="https://www.wemos.cc/product/d1-mini.html">Wemos D1 mini</a> drivers if needed (only Mac & Windows). Note that older versions of the driver will cause a kernel panic on Mac. Drivers can be found <a href="https://www.wemos.cc/downloads">here</a> and <a href="https://blog.sengotta.net/signed-mac-os-driver-for-winchiphead-ch340-serial-bridge/">here</a>.
+        Install <a href="https://www.wemos.cc/product/d1-mini.html" target="_blank">Wemos D1 mini</a> drivers if needed (only Mac & Windows). Note that older versions of the driver will cause a kernel panic on Mac. Drivers can be found <a href="https://www.wemos.cc/downloads" target="_blank">here</a> and <a href="https://blog.sengotta.net/signed-mac-os-driver-for-winchiphead-ch340-serial-bridge/" target="_blank">here</a>.
     </li>
 </ul>
 
@@ -80,7 +80,7 @@ void loop()
 </h3>
 
 <p>
-    Add code to connect to the local WIFI. The very neat <a href="https://github.com/tzapu/WiFiManager">WiFiManager</a> automatically acts as an AP if unable to connect to last known network.
+    Add code to connect to the local WIFI. The very neat <a href="https://github.com/tzapu/WiFiManager" target="_blank">WiFiManager</a> automatically acts as an AP if unable to connect to last known network.
 </p>
 
 <pre>
@@ -149,7 +149,7 @@ void loop()
 </h3>
 
 <p>
-    Letting the D1 mini act as a webserver can be handy for configuration purposes, e.g to passing over security credentials. There is a simple web server called <a href="https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WebServer">ESP8266WebServer</a> in the Arduino libraries.
+    Letting the D1 mini act as a webserver can be handy for configuration purposes, e.g to passing over security credentials. There is a simple web server called <a href="https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WebServer" target="_blank">ESP8266WebServer</a> in the Arduino libraries.
 </p>
 
 <pre>
@@ -199,7 +199,7 @@ void loop()
 </h3>
 
 <p>
-    No point in having a sensor without reading sensor data. This time we need to import an external library; the <a href="https://github.com/adafruit/Adafruit_DHT_Unified">Adafruit DHT Unified</a>. PlatformIO has made it available as a library dependency, which you add in the <a href="http://docs.platformio.org/en/stable/projectconf.html">platformio.ini</a> file.
+    No point in having a sensor without reading sensor data. This time we need to import an external library; the <a href="https://github.com/adafruit/Adafruit_DHT_Unified" target="_blank">Adafruit DHT Unified</a>. PlatformIO has made it available as a library dependency, which you add in the <a href="http://docs.platformio.org/en/stable/projectconf.html" target="_blank">platformio.ini</a> file.
 </p>
 
 <pre>
@@ -370,23 +370,23 @@ void loop()
 </h3>
 
 <p>
-  The <a href="https://aws.amazon.com/iot/sdk/">AWS IoT device SDKs</a> currently does not support the ESP8266. One problem is that AWS IoT devices are authenticated using X.509 certificates. See <a href="http://docs.aws.amazon.com/iot/latest/developerguide/iot-security-identity.html">documentation</a>. In short, the device must support:
+  The <a href="https://aws.amazon.com/iot/sdk/" target="_blank">AWS IoT device SDKs</a> currently does not support the ESP8266. One problem is that AWS IoT devices are authenticated using X.509 certificates. See <a href="http://docs.aws.amazon.com/iot/latest/developerguide/iot-security-identity.html" target="_blank">documentation</a>. In short, the device must support:
   <ul>
     <li>TLS1.2</li>
     <li>SHA-256 RSA certificate signature validation</li>
     <li>One of the cipher suites from the TLS cipher suite support section</li>
   </ul>
-  Neither the SDK from <a href="https://espressif.com/en/support/download/sdks-demos">Espressif</a> nor the <a href="https://github.com/esp8266/Arduino">Arduino Core</a> implementation currently support TLS1.2.   
+  Neither the SDK from <a href="https://espressif.com/en/support/download/sdks-demos" target="_blank">Espressif</a> nor the <a href="https://github.com/esp8266/Arduino" target="_blank">Arduino Core</a> implementation currently support TLS1.2.
 </p>
 
 <p>
   There are different approaches to supporting AWS IoT service. Listing some below:
   <ul>
-    <li>Arduino Core dev branch has a version of axTLS that support TLS1.2. The <a href="https://github.com/aws/aws-iot-device-sdk-embedded-C">AWS IoT Device SDK for embedded C</a> uses mbedTLS. Maybe it is possible to use axTLS instead?</li>
-    <li>AWS also have a new <a href="https://github.com/aws/aws-iot-device-sdk-cpp">Device SDK for C++</a> that has an abstract Network layer allowing different TLS libraries. Currently, there are reference implementations for openSSL, mbedTLS and Websockets. Maybe easier to port this?</li>
-    <li>One guy have cheated a little by using AWS IAM user credentials together with websockets to connect to AWS IoT. Requires you to hardcode the credentials in the code. Check it out <a href="https://github.com/odelot/aws-mqtt-websockets">here</a></li>
-    <li>Other initiatives that uses AWS IAM user credentials to connect to AWS services <a href="https://github.com/heskew/aws-sdk-arduino">here</a></li>
-    <li>A kind of wild idea is to use a completely different RTOS on the device, see <a href="http://blogs.paasmer.co/series-blogs-connect-esp-8266-nodemcu-aws-iot/">ESP-OPEN-RTOS</a>
+    <li>Arduino Core dev branch has a version of axTLS that support TLS1.2. The <a href="https://github.com/aws/aws-iot-device-sdk-embedded-C" target="_blank">AWS IoT Device SDK for embedded C</a> uses mbedTLS. Maybe it is possible to use axTLS instead?</li>
+    <li>AWS also have a new <a href="https://github.com/aws/aws-iot-device-sdk-cpp" target="_blank">Device SDK for C++</a> that has an abstract Network layer allowing different TLS libraries. Currently, there are reference implementations for openSSL, mbedTLS and Websockets. Maybe easier to port this?</li>
+    <li>One guy have cheated a little by using AWS IAM user credentials together with websockets to connect to AWS IoT. Requires you to hardcode the credentials in the code. Check it out <a href="https://github.com/odelot/aws-mqtt-websockets" target="_blank">here</a></li>
+    <li>Other initiatives that uses AWS IAM user credentials to connect to AWS services <a href="https://github.com/heskew/aws-sdk-arduino" target="_blank">here</a></li>
+    <li>A kind of wild idea is to use a completely different RTOS on the device, see <a href="http://blogs.paasmer.co/series-blogs-connect-esp-8266-nodemcu-aws-iot/" target="_blank">ESP-OPEN-RTOS</a>
   </ul>
 </p>
 
