@@ -32,6 +32,15 @@
     </ol>
 </p>
 
+<p>
+    Specs:
+    <ul>
+      <li>32-bit RISC CPU: Tensilica Xtensa LX106 running at 80 MHz</li>
+      <li>64 KiB of instruction RAM, 96 KiB of data RAM</li>
+      <li>4 MiB of external QSPI flash</li>
+    </ul>
+</p>
+
 <h3>
     Preperations
 </h3>
@@ -370,7 +379,7 @@ void loop()
 </h3>
 
 <p>
-  The <a href="https://aws.amazon.com/iot/sdk/" target="_blank">AWS IoT device SDKs</a> currently does not support the ESP8266. One problem is that AWS IoT devices are authenticated using X.509 certificates. See <a href="http://docs.aws.amazon.com/iot/latest/developerguide/iot-security-identity.html" target="_blank">documentation</a>. In short, the device must support:
+  The <a href="https://aws.amazon.com/iot/sdk/" target="_blank">AWS IoT device SDKs</a> currently does not support the ESP8266. The biggest problem seems to be the ESP8266 resource constraints, making authentication with X.509 certificates hard to implement. See <a href="http://docs.aws.amazon.com/iot/latest/developerguide/iot-security-identity.html" target="_blank">documentation</a>. In short, the device must support:
   <ul>
     <li>TLS1.2</li>
     <li>SHA-256 RSA certificate signature validation</li>
@@ -380,13 +389,36 @@ void loop()
 </p>
 
 <p>
-  There are different approaches to supporting AWS IoT service. Listing some below:
+  However, there are other communication protocols than MQTT (default), which requires less powerful authentication, see <a href="http://docs.aws.amazon.com/iot/latest/developerguide/protocols.html" target="_blank">documentation</a>. One of them is MQTT over <b>websockets</b>. Fortunately, there's an italian guy who implemented an Arduino library just for this. See <a href="https://github.com/odelot/aws-mqtt-websockets" target="_blank">aws-mqtt-websockets</a>. The library lacks most of the features the AWS Device SDK provides, such as shadow support, but it does allow us to authenticate with AWS IoT service and update the shadow MQTT topics manually.
+</p>
+
+<p>
+  The library uses AWS IAM user credentials to login instead of X.509 certificates. It also has som some dependencies that needs to be manually installed. You need to do the following:
+  <ol>
+    <li>Create a new Platformio project</li>
+    <li>Install the following <a href="https://github.com/odelot/aws-mqtt-websockets#dependencies" target="_blank">dependencies</a>. You probably need to set the <a href="http://docs.platformio.org/en/latest/projectconf.html#lib-compat-mode" target="_blank">lib-compat-mode</a> to 0 in the platformio.ini file, because the MQTTClient library from Eclipse paho is not considered a compatible library by Platformio.</li>
+    <li>Use the example file from <a href="https://github.com/odelot/aws-mqtt-websockets/blob/master/examples/aws-mqtt-websocket-example/aws-mqtt-websocket-example.ino" target="_blank">here</a></li>
+    <li>Log in to AWS and create a new IAM user. Add it to the <b>IotDevices</b> group. Don't forget to download the IAM credentials for the new user</li>
+    <li>Create a new IoT device. Find out its endpoint and shadow topic paths</li>
+    <li>Add WIFI credentials, AWS IoT device endpoint, IAM credentials (key and secret), AWS region and shadow path to the example file</li>
+    <li>Build and upload</li>
+    <li>If it connects, clean up the example code and have it publish temperature information regularly. If not, you can enable <a href="https://github.com/odelot/aws-mqtt-websockets/issues/6#issuecomment-215538459" target="_blank">debug prints</a></li>
+  </ol>
+</p>
+
+<h3>
+    Lab 8 - AWS IoT the proper way
+</h3>
+
+<p>
+Bonus lab. Basically means you need to implement support for ESP8266 in the AWS Device SDK.
+</p>
+
+<p>
+  There are different approaches to supporting AWS IoT service.
   <ul>
     <li>Arduino Core dev branch has a version of axTLS that support TLS1.2. The <a href="https://github.com/aws/aws-iot-device-sdk-embedded-C" target="_blank">AWS IoT Device SDK for embedded C</a> uses mbedTLS. Maybe it is possible to use axTLS instead?</li>
     <li>AWS also have a new <a href="https://github.com/aws/aws-iot-device-sdk-cpp" target="_blank">Device SDK for C++</a> that has an abstract Network layer allowing different TLS libraries. Currently, there are reference implementations for openSSL, mbedTLS and Websockets. Maybe easier to port this?</li>
-    <li>One guy have cheated a little by using AWS IAM user credentials together with websockets to connect to AWS IoT. Requires you to hardcode the credentials in the code. Check it out <a href="https://github.com/odelot/aws-mqtt-websockets" target="_blank">here</a></li>
-    <li>Other initiatives that uses AWS IAM user credentials to connect to AWS services <a href="https://github.com/heskew/aws-sdk-arduino" target="_blank">here</a></li>
-    <li>A kind of wild idea is to use a completely different RTOS on the device, see <a href="http://blogs.paasmer.co/series-blogs-connect-esp-8266-nodemcu-aws-iot/" target="_blank">ESP-OPEN-RTOS</a>
   </ul>
 </p>
 
